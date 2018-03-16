@@ -1,10 +1,14 @@
 #include "hBMP.h"
-#include "hDHT.h"
+#include "DHT.h"
 #include <Wire.h>
 #include <string.h>
 #include <SoftwareSerial.h>
 #include <avr/wdt.h>
 #include "TinyGPS++.h"
+#define DHTPIN 2
+#define DHTTYPE DHT22
+
+
 int flag = 0;
 int i = 1;
 
@@ -21,12 +25,16 @@ TinyGPSPlus gps;
 SoftwareSerial ss(3 , 4);
 SoftwareSerial ubk(10 , 11);
 
-hDHT _dht(2, DHT22);
+DHT dht(DHTPIN, DHTTYPE);
+
 hBMP bmp;
 bool _f1, _f2, _f3, _f4;
 bool istime1 = true;
 bool istime2 = true;
 String _B1, _B2;
+float h = 0;
+float t = 0;
+ float f = 0;
 
 void receiveEvent(int howMany) {
   Serial.println("recebi algo");
@@ -46,6 +54,7 @@ void requestEvent() {
 	 Serial.println(F("B1 requisitada."));
    char chardata1[32];
    stringdata1.toCharArray(chardata1, 32);
+   Serial.println(chardata1);
 	 Wire.write(chardata1);
 	}
   wdt_reset();
@@ -122,7 +131,7 @@ void setup(){
 	Serial.begin(115200);
 	Serial.println("Setup incializado.");
 
-	_dht.begin();
+	dht.begin();
     Serial.println(F("DHT incializado."));
 
 	Wire.begin(94);  //endereço i2c             
@@ -137,6 +146,23 @@ void setup(){
 
 
 void loop(){
+  h = dht.readHumidity();
+  // Read temperature as Celsius (the default)
+  t = dht.readTemperature();
+  // Read temperature as Fahrenheit (isFahrenheit = true)
+  f = dht.readTemperature(true);
+
+  // Check if any reads failed and exit early (to try again).
+  if (isnan(h) || isnan(t) || isnan(f)) {
+    Serial.println("Failed to read from DHT sensor!");
+  }
+  
+  stringdata5 = "";
+  stringdata5.concat(t);stringdata5.concat(";");
+  stringdata5.concat(h);stringdata5.concat(";");
+  stringdata5.concat("xxx");
+  
+
 
   static const double Home_LAT = -22.000818, Home_LON = -47.901968;
 
@@ -162,7 +188,6 @@ void loop(){
       istime1 = false;
       stringdata1 = "";
       stringdata2 = "";
-      stringdata5 = "";
       stringdata1.concat("u");stringdata1.concat(";");    
       stringdata1.concat(gps.hdop.value());stringdata1.concat(";"); //saude do fix
       stringdata1.concat((gps.location.lat()*10000));stringdata1.concat(";");
@@ -179,12 +204,9 @@ void loop(){
       //stringdata2.concat(cardinalToLondon);stringdata2.concat(";");
       //stringdata2.concat(TinyGPSPlus::cardinal(gps.course.value()));stringdata2.concat("\n");
 
-      stringdata5.concat(_dht.getTemp());stringdata5.concat(";");
-      stringdata5.concat(_dht.getHumd());stringdata5.concat(";");
-      stringdata5.concat("xxx");
       
 
-  
+      
       flag = 1;
    } 
   }
@@ -194,7 +216,6 @@ void loop(){
       istime2 = false;
       stringdata3 = "";
       stringdata4 = "";
-      stringdata5 = "";
       stringdata3.concat("a");stringdata3.concat(";");    
       stringdata3.concat(gps.hdop.value());stringdata3.concat(";"); //saude do fix
       stringdata3.concat((gps.location.lat()*10000));stringdata3.concat(";");
@@ -213,9 +234,7 @@ void loop(){
       //stringdata4.concat(cardinalToLondon);stringdata4.concat(";");
       //stringdata4.concat(TinyGPSPlus::cardinal(gps.course.value()));stringdata4.concat("\n");
 
-      stringdata5.concat(_dht.getTemp());stringdata5.concat(";");
-      stringdata5.concat(_dht.getHumd());stringdata5.concat(";");
-      stringdata5.concat("xxx");
+     
       
 
       
