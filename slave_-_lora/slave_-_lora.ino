@@ -7,30 +7,39 @@
 #include <stdlib.h>
 #include <string.h>
 #include <util/crc16.h>
+#include <Servo.h>
 
-
+Servo myservo;
+int inicio = 0;
+int fim = 90;
+int pos = 0;
+int last_pos = inicio;
 #define RADIOPIN 5
 Adafruit_BMP085 bmp;
 int counter = 0;
 int i = 1;
 String stringdata = "";
+String statustampa = "fechado";
 char _B[20];
 char c;
 int x = 1;
 bool stp = true;
 long lastalt = 0;
 long lastmillis = 0;
-int vel = 0;
+float vel = 0;
+float ref_alt = 0;
+bool status_sd = true;
+
+int red = 3;
+int green = 6;
+int blue = 10;
+
 File myFile;
 
-void radioSetup(){
-	pinMode(RADIOPIN, OUTPUT);
-	pinMode(A1, OUTPUT);
-	//digitalWrite(A1, HIGH); 
-}
-
 void setup(){  
- Serial.begin(115200);
+ Serial.begin(9600);
+ myservo.attach(9);
+ pinMode(red, OUTPUT);
  Wire.begin();
  
  if (!bmp.begin()){
@@ -42,39 +51,42 @@ void setup(){
     Serial.println("Starting LoRa failed!");
     while (1);
   }
+  LoRa.setTxPower(20, 1);
   LoRa.setSignalBandwidth(125E3);
   LoRa.setSpreadingFactor(11);
-  //LoRa.explicitHeaderMode();
+  LoRa.enableCrc();
   
 	
-	while (!SD.begin(4)) {
+	if (!SD.begin(4)) {
     	Serial.println("Falha no SD.");
+      digitalWrite(red, HIGH);
+      status_sd = false;
     	delay(1000);
   	}
-  	Serial.println("SD inicializado.");
-
-  	_B[0] = '\0';
-
-  	radioSetup();
+  else{ 
+      Serial.println("SD inicializado.");
+  }
   	wdt_enable(WDTO_8S);
+    ref_alt = bmp.readAltitude();
 }
 
 
 void save_data(){
-	int time = millis();
+  digitalWrite(red, LOW);
 	wdt_reset(); 
 	Serial.println(F("Save."));
 	myFile = SD.open("log.txt", FILE_WRITE);
 	if(myFile){
-		myFile.print(time);
-		myFile.print(';');
 		myFile.println(stringdata);
 		myFile.close();
 		Serial.println(F("Gravado."));
-	}
+	}else{
+    digitalWrite(red, HIGH); 
+  }
 }
 
 void receive_data(){
+  digitalWrite(blue, HIGH);
   Wire.beginTransmission(94);
   Wire.write(i);
   Wire.endTransmission();
@@ -91,42 +103,10 @@ void receive_data(){
     }
   }
   stp = true;
+  digitalWrite(blue, LOW);
 }
 
-void rtty_txbit (int bit) {
-  if (bit) {
-    digitalWrite(5, HIGH);
-  }
-  else {
-    digitalWrite(5, LOW);
-  }
-
-  delayMicroseconds(10000);
-  delayMicroseconds(10150); 
-}
-
-void rtty_txbyte (char c) {
-	int i;
-	rtty_txbit (0);
-	for (i = 0; i < 7; i++) { // Change this here 7 or 8 for ASCII-7 / ASCII-8
-		if (c & 1) rtty_txbit(1);
-		else rtty_txbit(0);
-		c = c >> 1;
-	}
-	rtty_txbit (1); // Stop bit
-	rtty_txbit (1); // Stop bit
-	wdt_reset();
-}
-
-void rtty_txstring (char * string) {
-	char c;
-	c = *string++;
-	while ( c != '\0') {
-		rtty_txbyte (c);
-		c = *string++;
-	}
-}
-
+/*
 uint16_t gps_CRC16_checksum (char *string) {
   size_t i;
   uint16_t crc;
@@ -139,12 +119,11 @@ uint16_t gps_CRC16_checksum (char *string) {
   }
   return crc;
 }
+*/
 
 void loop(){
 	receive_data();
 	wdt_reset(); 
-	//rtty_txstring("hi");
-	wdt_reset();
 	delay(1000);
   i++;
   if (i > 5 ){
@@ -155,8 +134,18 @@ void loop(){
     stringdata.concat(bmp.readPressure()); stringdata.concat(";");
     stringdata.concat(bmp.readTemperature()); stringdata.concat(";");
     stringdata.concat(millis()/1000); stringdata.concat(";");
-    vertical_speed();
-    stringdata.concat(vel);
+    float verticalspeed = vertical_speed();
+    hora_de_abrir(verticalspeed, referencia_altitude());
+    stringdata.concat(verticalspeed);
+    stringdata.concat(statustampa);
+    lastalt = referencia_altitude();
+    lastmillis = millis();
+    if (status_sd){
+        stringdata.concat(";ok;");
+    }else{
+        stringdata.concat(";fail;");
+    }
+    wdt_reset();
     LoRa.print(stringdata);
     LoRa.print(counter);
     LoRa.endPacket();
@@ -165,13 +154,41 @@ void loop(){
     save_data();
     stringdata = "";
     i = 1;
-
-    lastalt = bmp.readAltitude();
-    lastmillis = millis();
   }
 }
 
-void vertical_speed(){
-  vel = (bmp.readAltitude() - lastalt)*1000/(millis() - lastmillis);
+float vertical_speed(){
+  vel = (referencia_altitude() - lastalt)*1000/(millis() - lastmillis);
+  return vel;
 }
+
+float referencia_altitude(){
+  ref_alt = 0;
+  for (int x = 0; i == 5; i++){
+    ref_alt = ref_alt + bmp.readAltitude();
+    delay(10);
+  }
+  ref_alt = ref_alt/5;
+  return ref_alt;
+}
+
+void hora_de_abrir(float v, float h){
+  if (h >= 8000 && h <= 28000 && v >= 1){
+    for (pos = last_pos; pos <= fim; pos++){
+      myservo.write(pos);              
+      delay(15);    
+      last_pos = pos;                   
+    } statustampa = ";aberto"; 
+  }else{
+    for (pos = last_pos; pos >= inicio; pos++){
+      myservo.write(pos);              
+      delay(15);                       
+    } statustampa = ";fechado";
+    last_pos = inicio;
+  }
+}
+
+
+
+
 
