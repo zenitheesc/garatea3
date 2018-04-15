@@ -7,13 +7,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <util/crc16.h>
-#include <Servo.h>
+//#include <Servo.h>
 
-Servo myservo;
-int inicio = 0;
-int fim = 90;
-int pos = 0;
-int last_pos = inicio;
+//Servo myservo;
+//int inicio = 0;
+//int fim = 90;
+//int pos = 0;
+//int last_pos = inicio;
 #define RADIOPIN 5
 Adafruit_BMP085 bmp;
 int counter = 0;
@@ -38,7 +38,7 @@ File myFile;
 
 void setup(){  
  Serial.begin(9600);
- myservo.attach(9);
+ //myservo.attach(9);
  pinMode(red, OUTPUT);
  Wire.begin();
  
@@ -47,9 +47,8 @@ void setup(){
   }
  
  LoRa.setPins(7, A0, 2);
-  if (!LoRa.begin(433E6)) {
+  if (!LoRa.begin(433.123E6)) {
     Serial.println("Starting LoRa failed!");
-    while (1);
   }
   LoRa.setTxPower(20, 1);
   LoRa.setSignalBandwidth(125E3);
@@ -106,21 +105,6 @@ void receive_data(){
   digitalWrite(blue, LOW);
 }
 
-/*
-uint16_t gps_CRC16_checksum (char *string) {
-  size_t i;
-  uint16_t crc;
-  uint8_t c;
-  crc = 0xFFFF;
-
-  for (i = 2; i < strlen(string); i++) {
-    c = string[i];
-    crc = _crc_xmodem_update (crc, c);
-  }
-  return crc;
-}
-*/
-
 void loop(){
 	receive_data();
 	wdt_reset(); 
@@ -135,15 +119,15 @@ void loop(){
     stringdata.concat(bmp.readTemperature()); stringdata.concat(";");
     stringdata.concat(millis()/1000); stringdata.concat(";");
     float verticalspeed = vertical_speed();
-    hora_de_abrir(verticalspeed, referencia_altitude());
+    //hora_de_abrir(verticalspeed, referencia_altitude());
     stringdata.concat(verticalspeed);
-    stringdata.concat(statustampa);
+    //stringdata.concat(statustampa);
     lastalt = referencia_altitude();
     lastmillis = millis();
     if (status_sd){
-        stringdata.concat(";ok;");
+        stringdata.concat(";1;");
     }else{
-        stringdata.concat(";fail;");
+        stringdata.concat(";0;");
     }
     wdt_reset();
     LoRa.print(stringdata);
@@ -172,6 +156,7 @@ float referencia_altitude(){
   return ref_alt;
 }
 
+/*
 void hora_de_abrir(float v, float h){
   if (h >= 8000 && h <= 28000 && v >= 1){
     for (pos = last_pos; pos <= fim; pos++){
@@ -187,8 +172,7 @@ void hora_de_abrir(float v, float h){
     last_pos = inicio;
   }
 }
-
-
+*/
 
 
 
