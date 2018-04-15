@@ -2,8 +2,8 @@
 #include <SPI.h>
 #include <SD.h>
 #include <avr/wdt.h>
-#include <LoRa.h>
-#include <Adafruit_BMP085.h> 
+#include "LoRa.h"
+#include "Adafruit_BMP085.h" 
 #include <stdlib.h>
 #include <string.h>
 #include <util/crc16.h>
@@ -32,10 +32,11 @@ long lastmillis = 0;
 float vel = 0;
 float ref_alt = 0;
 bool status_sd = true;
+char string_comprimida_eeprom[128];
 
-#define red = 3;
-#define green = 6;
-#define blue = 10;
+#define red 3
+#define green 6
+#define blue 10
 
 File myFile;
 
@@ -138,7 +139,8 @@ void loop(){
     counter++;
     Serial.println(stringdata);
     save_data();
-    eeprom.writestring(stringdata);
+    eeprom.zipstring(&stringdata[0u], string_comprimida_eeprom);
+    eeprom.writestring(string_comprimida_eeprom, 1);
     stringdata = "";
     i = 1;
   }
@@ -151,7 +153,7 @@ float vertical_speed(){
 
 float referencia_altitude(){
   ref_alt = 0;
-  for (int x = 0; i == 5; i++){
+  for (int x = 0; x == 5; x++){
     ref_alt = ref_alt + bmp.readAltitude();
     delay(10);
   }
