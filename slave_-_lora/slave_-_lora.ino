@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <util/crc16.h>
+
+#include "eeprom.h"
+
 //#include <Servo.h>
 
 //Servo myservo;
@@ -30,23 +33,21 @@ float vel = 0;
 float ref_alt = 0;
 bool status_sd = true;
 
-int red = 3;
-int green = 6;
-int blue = 10;
+#define red = 3;
+#define green = 6;
+#define blue = 10;
 
 File myFile;
 
 void setup(){  
- Serial.begin(9600);
- //myservo.attach(9);
- pinMode(red, OUTPUT);
- Wire.begin();
- 
- if (!bmp.begin()){
+  Serial.begin(9600);
+  //myservo.attach(9);
+  pinMode(red, OUTPUT);
+  Wire.begin();
+  if (!bmp.begin()){
     Serial.println("Sensor nao encontrado !!");
   }
- 
- LoRa.setPins(7, A0, 2);
+  LoRa.setPins(7, A0, 2);
   if (!LoRa.begin(433.123E6)) {
     Serial.println("Starting LoRa failed!");
   }
@@ -54,8 +55,6 @@ void setup(){
   LoRa.setSignalBandwidth(125E3);
   LoRa.setSpreadingFactor(11);
   LoRa.enableCrc();
-  
-	
 	if (!SD.begin(4)) {
     	Serial.println("Falha no SD.");
       digitalWrite(red, HIGH);
@@ -65,8 +64,11 @@ void setup(){
   else{ 
       Serial.println("SD inicializado.");
   }
-  	wdt_enable(WDTO_8S);
-    ref_alt = bmp.readAltitude();
+  eeprom.switchto(0);
+  eeprom.resetlogs();
+  eeprom.init(0);
+  wdt_enable(WDTO_8S);
+  ref_alt = bmp.readAltitude();
 }
 
 
@@ -136,6 +138,7 @@ void loop(){
     counter++;
     Serial.println(stringdata);
     save_data();
+    eeprom.writestring(stringdata);
     stringdata = "";
     i = 1;
   }
