@@ -16,6 +16,7 @@ void setup() {
   }
   LoRa.setSignalBandwidth(125E3);
   LoRa.setSpreadingFactor(11);
+  LoRa.enableCrc();
 }
 
 void loop() {
