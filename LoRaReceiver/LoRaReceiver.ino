@@ -10,7 +10,7 @@ void setup() {
 
   Serial.println("LoRa Sender");
   LoRa.setPins(7, A0, 2);
-  if (!LoRa.begin(433E6)) {
+  if (!LoRa.begin(433.123E6)) {
     Serial.println("Starting LoRa failed!");
     while (1);
   }
