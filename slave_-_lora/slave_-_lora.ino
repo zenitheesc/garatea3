@@ -32,7 +32,7 @@ long lastmillis = 0;
 float vel = 0;
 float ref_alt = 0;
 bool status_sd = true;
-//char string_comprimida_eeprom[128];
+char cstr[128];
 
 #define red 3
 #define green 6
@@ -142,6 +142,8 @@ void loop(){
     //eeprom.zipstring(&stringdata[0u], string_comprimida_eeprom);
     //eeprom.writestring(string_comprimida_eeprom, 1);
     eeprom.writestring(&stringdata[0u], 0);
+    strncpy(cstr, stringdata.c_str(), sizeof(cstr));
+    cstr[sizeof(cstr) - 1] = 0;
     stringdata = "";
     i = 1;
   }
