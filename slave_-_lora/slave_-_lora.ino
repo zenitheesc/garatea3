@@ -144,6 +144,7 @@ void loop(){
     strncpy(cstr, stringdata.c_str(), sizeof(cstr));
     cstr[sizeof(cstr) - 1] = 0;
     eeprom.writestring(cstr, 0);
+    eeprom.updatelogs();
     stringdata = "";
     i = 1;
   }
