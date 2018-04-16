@@ -141,9 +141,9 @@ void loop(){
     save_data();
     //eeprom.zipstring(&stringdata[0u], string_comprimida_eeprom);
     //eeprom.writestring(string_comprimida_eeprom, 1);
-    eeprom.writestring(&stringdata[0u], 0);
     strncpy(cstr, stringdata.c_str(), sizeof(cstr));
     cstr[sizeof(cstr) - 1] = 0;
+    eeprom.writestring(cstr, 0);
     stringdata = "";
     i = 1;
   }
