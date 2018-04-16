@@ -20,11 +20,11 @@ void setup() {
   Serial.println(last);
   Serial.println("Init done!");
   Serial.println("---EEPROM DATA---");
-  ptr = 3;
+  ptr = 0;
   while (ptr < last) {
     c = eeprom.readbyte( ptr );
     Serial.print( c );
-    if (((ptr + 1) % 96 == 0) || ( c == '\0' ) || ( c == ';' ) ) {
+    if ( c == '\0' ) {
       Serial.println(' ');
     }
     ptr++;

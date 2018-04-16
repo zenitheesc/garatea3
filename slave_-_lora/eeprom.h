@@ -41,6 +41,7 @@ public:
       uint8_t half[2];          //dps le as metades :)
     } memdiv;
     memdiv mempos;              //aponta para a posição principal na eeprom
+    memdiv temppos;
     uint8_t err;                                                        //log de erros
     void gotobyte(uint16_t x);                                          //move o ponto em que estão sendo salvos os dados na eeprom
     void writebyte(uint8_t data, uint16_t pos);                         //escreve um unico byte na posiçao especificada, sem restrições

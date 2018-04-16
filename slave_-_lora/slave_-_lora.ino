@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <util/crc16.h>
+#include <avr/io.h>
 
 #include "eeprom.h"
 
@@ -32,11 +33,13 @@ long lastmillis = 0;
 float vel = 0;
 float ref_alt = 0;
 bool status_sd = true;
-char cstr[128];
+char cstr[150];
+uint8_t eeprom_skip_counter = 0;
 
 #define red 3
 #define green 6
 #define blue 10
+#define eeprom_skip 10
 
 File myFile;
 
@@ -65,9 +68,8 @@ void setup(){
   else{ 
       Serial.println("SD inicializado.");
   }
-  eeprom.switchto(0);
-  eeprom.resetlogs();
   eeprom.init(0);
+  DDRB = DDRB & 0b11111110;
   wdt_enable(WDTO_8S);
   ref_alt = bmp.readAltitude();
 }
@@ -110,7 +112,13 @@ void receive_data(){
 
 void loop(){
 	receive_data();
-	wdt_reset(); 
+	wdt_reset();
+  if( 0x00 == ( 0x01 & PINB) ){
+    Serial.println("ENTROU NESSA PORRA");
+    eeprom.mempos.full = reserved;
+    eeprom.err = 0x00;
+    eeprom.resetlogs();
+   } 
 	delay(1000);
   i++;
   if (i > 5 ){
@@ -137,14 +145,24 @@ void loop(){
     LoRa.print(counter);
     LoRa.endPacket();
     counter++;
-    Serial.println(stringdata);
+    //Serial.println(stringdata);
     save_data();
     //eeprom.zipstring(&stringdata[0u], string_comprimida_eeprom);
     //eeprom.writestring(string_comprimida_eeprom, 1);
     strcpy(cstr, stringdata.c_str());
     //cstr[strlen(cstr)] = 0;
-    eeprom.writestring(cstr, 0);
-    eeprom.updatelogs();
+    Serial.println(stringdata);
+    Serial.println(strlen(cstr)+1);
+    Serial.println(eeprom.mempos.full);
+    eeprom_skip_counter++;
+    if(eeprom_skip_counter > eeprom_skip){
+      eeprom.writestring(cstr, 0);
+      eeprom.updatelogs();
+      eeprom_skip_counter = 0;
+    }
+    Serial.print("Posicao:");
+    Serial.println((uint16_t(eeprom.readbyte(0))<<8)+uint16_t(eeprom.readbyte(1)));
+    Serial.println(eeprom.err);
     stringdata = "";
     i = 1;
   }
