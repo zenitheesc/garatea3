@@ -3,12 +3,11 @@
 String stringdata = "";
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   while (!Serial);
 
   Serial.println("LoRa Receiver");
 
-  Serial.println("LoRa Sender");
   LoRa.setPins(7, A0, 2);
   if (!LoRa.begin(433.123E6)) {
     Serial.println("Starting LoRa failed!");
@@ -24,7 +23,6 @@ void loop() {
   int packetSize = LoRa.parsePacket();
   if (packetSize) {
     // received a packet
-    Serial.print("Received packet '");
 
     // read packet
     while (LoRa.available()) {
@@ -32,9 +30,8 @@ void loop() {
     }
 
     // print RSSI of packet
-    Serial.println(stringdata);
+    Serial.print(stringdata); Serial.print(";");
     stringdata = "";
-    Serial.print("' with RSSI ");
     Serial.println(LoRa.packetRssi());
   }
 }
