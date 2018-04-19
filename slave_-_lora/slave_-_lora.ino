@@ -114,10 +114,17 @@ void loop(){
 	receive_data();
 	wdt_reset();
   if( 0x00 == ( 0x01 & PINB) ){
-    Serial.println("ENTROU NESSA PORRA");
+    Serial.println("eeprom formatada....");
     eeprom.mempos.full = reserved;
     eeprom.err = 0x00;
     eeprom.resetlogs();
+    //digitalWrite(red, HIGH);
+    digitalWrite(green, HIGH);
+    //digitalWrite(blue, HIGH);
+    delay(4000);
+    //digitalWrite(red, LOW);
+    digitalWrite(green, LOW);
+    //digitalWrite(blue, LOW);
    } 
 	delay(1000);
   i++;
