@@ -1,5 +1,6 @@
-<h1 align="center" style="color:white; background-color:black">Garatéa 3</h1>
-<h4 align="center">Zenith's third probe</h4>
+
+<h1 align="center" style="color:white; background-color:black">Garatea 3</h1>
+<h4 align="center">Our aerospace probes are attached to balloons filled with helium, carrying astrobiological experiments to the stratosphere, which is crucial so we can have a better understanding about how organisms can survive in space.</h4>
 
 <p align="center">
 	<a href="http://zenith.eesc.usp.br/">
@@ -11,7 +12,7 @@
     <a href="https://github.com/zenitheesc/garatea3/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/zenitheesc/garatea3?style=for-the-badge"/>
     </a>
-    <a href="https://github.com/zenitheesc/garatea3/issues">
+    <a href="https://github.com/${{ env.REPOSITORY_FULL_NAME }}/issues">
     <img src="https://img.shields.io/github/issues/zenitheesc/garatea3?style=for-the-badge"/>
     </a>
     <a href="https://github.com/zenitheesc/garatea3/commits/main">
@@ -32,24 +33,27 @@
 </p>
 
 <p align="center">
-    <a href="#environment-and-tools">Environment and Tools</a> •
-    <a href="#steps-to-run-and-debug">Steps to run and debug</a> •
-    <a href="#how-to-contribute">How to contribute?</a> •
+    <a href="#what-are-aerospace-probes">What are aerospace probes?</a> •
+    <a href="#details">Details</a> 
 </p>
 
-## Environment and tools
+## What are aerospace probes?
 
-`Add list of dependencies and software needed to run this project (if possible add the versions that were used in development).`
+ Our aerospace probes are balloons filled with helium, carrying astrobiological experiments to the stratosphere, which is crucial so we can have a better understanding about how organisms can survive in space.
 
-## Steps to run and debug
+Although they are part of a greater scientific experiment, the probes themselves are also fascinating from the point of view of embedded systems development. Our probes are equiped with microcontrolers, radios, sensors and cameras; every mission we aim to improve our systems so we can make the next mission even more efficient.
 
-`A simple list of steps indicating how one can run and test the project.`
+And, to sustain all our experiments and systems, we build reliable and reusable structures, that let us go to space multiple times. 
 
-## How to contribute
+## Details
+| Launch Date |Max Altitude|Experiments|Awards
+|--|--|--|--|
+| 22/04/2018 | 31,6 km |Experiments with yeasts, fungi and protozoa|3rd Place in Best Design (GSBC 2018)
 
-`(optional, depends on the project) list of simple rules to help people work on the project.`
-
-`Examples: How to format a pull request\n How to format an issue`
+| | | |
+|:-------------------------:|:-------------------------:|:-------------------------:|
+|<img width="1604" alt="" src="https://raw.githubusercontent.com/zenitheesc/zenith-website/develop/public/images/Projetos/SondasAeroespaciais/Garat%C3%A9a-III/photo1.webp"> |  <img width="1604" alt="" src="https://raw.githubusercontent.com/zenitheesc/zenith-website/develop/public/images/Projetos/SondasAeroespaciais/Garat%C3%A9a-III/photo2.webp">|<img width="1604" alt="" src="https://raw.githubusercontent.com/zenitheesc/zenith-website/develop/public/images/Projetos/SondasAeroespaciais/Garat%C3%A9a-III/photo3.webp">|
+|<img width="1604" alt="" src="https://raw.githubusercontent.com/zenitheesc/zenith-website/develop/public/images/Projetos/SondasAeroespaciais/Garat%C3%A9a-III/photo4.webp">  | <img width="1604" alt="" src="https://raw.githubusercontent.com/zenitheesc/zenith-website/develop/public/images/Projetos/SondasAeroespaciais/Garat%C3%A9a-III/photo5.webp">| <img width="1604" alt="" src="https://raw.githubusercontent.com/zenitheesc/zenith-website/develop/public/images/Projetos/SondasAeroespaciais/Garat%C3%A9a-III/photo6.webp">| <img width="1604" alt="" src="https://raw.githubusercontent.com/zenitheesc/zenith-website/develop/public/images/Projetos/SondasAeroespaciais/Garat%C3%A9a-III/photo7.webp">|
 
 ---
 
